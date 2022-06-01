@@ -1,8 +1,23 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
+import express from 'express';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-  await app.listen(3000);
-}
-bootstrap();
+const app = express();
+const httpServer = createServer(app);
+export const io = new Server(httpServer, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST'],
+  },
+});
+
+io.on('connection', (socket) => {
+  socket.id
+  socket.emit('console', 'you connected to the server');
+
+  socket.on('message', (msg) => {
+    io.emit('message', msg);
+  });
+});
+
+httpServer.listen(3000);
