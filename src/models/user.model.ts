@@ -4,8 +4,8 @@ export type User = {
   name: string;
 };
 
-const roleSchema = new Schema<User>({
+const userSchema = new Schema<User>({
   name: { type: String, required: true },
 });
 
-export const RoleModel = model<User>('Role', roleSchema);
+export const UserModel = model<User>('User', userSchema);
