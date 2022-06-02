@@ -5,11 +5,15 @@
   "author": "",
   "private": true,
   "license": "UNLICENSED",
+  "engines": {
+    "node": "14.17.4"
+  },
   "scripts": {
+    "start": "node dist/main.js",
     "build": "tsc",
     "watch-ts": "tsc -w",
     "watch-node": "nodemon dist/main.js",
-    "postinstall": "tsc",
+    "postinstall": "npm run build",
     "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript, Node\" -c \"yello.bold, cyan.bold\" \"npm run watch-ts\" \"npm run watch-node\"",
     "test": "mocha -r ts-node/register src/**/*.spec.ts"
   },
@@ -19,13 +23,18 @@
     "@nestjs/platform-express": "^8.0.0",
     "@nestjs/platform-socket.io": "^8.4.5",
     "@nestjs/websockets": "^8.4.5",
+    "body-parser": "^1.20.0",
     "concurrently": "^7.2.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.1",
     "express": "^4.18.1",
+    "mongoose": "^6.3.5",
     "nodemon": "^2.0.16",
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^7.2.0",
-    "socket.io": "^4.5.1"
+    "socket.io": "^4.5.1",
+    "typescript": "^4.7.2"
   },
   "devDependencies": {
     "@nestjs/cli": "^8.0.0",
