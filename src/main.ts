@@ -6,6 +6,8 @@ import { db } from './models';
 import { router as userRouter } from './routes/user.routes';
 import { router as roleRouter } from './routes/role.routes';
 import bodyParser from 'body-parser';
+import { User } from './models/user.model';
+import { _getUserById } from './controllers/user.controller';
 
 export const app = express();
 app.use(bodyParser.json());
@@ -34,27 +36,27 @@ db.mongoose.connect(db.url).then(() => {
   console.log('Connected to the database!', db.url);
 });
 
-io.on('connection', (socket) => {
-  let nama = '';
-  socket.emit('console', {
-    type: 'askForName',
-    options: { name: '', socketId: socket.id },
-  });
+io.on('connection', async (socket) => {
+  let connectedUser: User = null;
+  const userId = Array.isArray(socket.handshake.query.userId)
+    ? socket.handshake.query.userId[0]
+    : socket.handshake.query.userId;
 
-  socket.on('name', (name: string) => {
-    nama = name;
-    socket.emit('console', {
-      type: 'displayMessage',
-      options: {
-        message: `Hello ${name}, you are successfully connected`,
-        color: 'blue',
-      },
+  await _getUserById(userId)
+    .then((user) => {
+      connectedUser = user;
+    })
+    .catch((err) => {
+      console.log(err);
     });
-  });
+  if (!connectedUser) {
+    socket.disconnect();
+    return;
+  }
 
   socket.on('message', (msg) => {
     console.log('test');
-    io.emit(`message`, `${nama}: ${msg}`);
+    io.emit(`message`, `${connectedUser.name}: ${msg}`);
   });
 });
 
