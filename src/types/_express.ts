@@ -1,0 +1,6 @@
+import { Response, Request } from 'express';
+
+export interface TypedRequestBody<T> extends Request {
+  body: T;
+}
+export type TypedResponse = Response;
