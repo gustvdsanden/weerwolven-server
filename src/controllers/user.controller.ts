@@ -1,10 +1,15 @@
 import { User } from '../models/user.model';
 import { db } from '../models';
+import { TypedRequestBody, TypedResponse } from '../types';
+import { mapUserForSending } from '../util';
 const User = db.User;
 
-export function getAllUsers(req: any, res: any) {
+export function getAllUsers(
+  req: TypedRequestBody<{ name: string; password: string }>,
+  res: TypedResponse,
+) {
   User.find({}).then((users: User[]) => {
-    res.send(users);
+    res.send(users.map(mapUserForSending));
   });
 }
 
@@ -12,30 +17,16 @@ export function _getUserById(id: string): Promise<User> {
   return User.findById(id).exec();
 }
 
-export function getUserById(req: any, res: any) {
+export function getUserById(
+  req: TypedRequestBody<{ name: string; password: string }>,
+  res: TypedResponse,
+) {
   const id = req.params.id;
   _getUserById(id)
     .then((user: User) => {
-      res.send(user);
+      res.send(mapUserForSending(user));
     })
     .catch((err) => {
-      res.status(400).send(err);
-    });
-}
-
-export async function createUser(req: any, res: any) {
-  if (await User.findOne({ name: req.body.name }).exec()) {
-    res.status(400).send({ message: 'User already exists' });
-    return;
-  }
-
-  const user = new User(req.body);
-  await user
-    .save()
-    .then((user: User) => {
-      res.send(user);
-    })
-    .catch((err: any) => {
       res.status(400).send(err);
     });
 }

@@ -24,9 +24,6 @@ export const io = new Server(httpServer, {
     methods: ['GET', 'POST'],
   },
 });
-app.get('/', (req, res) => {
-  res.send('hello world');
-});
 
 app.use('/users', userRouter);
 app.use('/roles', roleRouter);
