@@ -10,7 +10,6 @@ export async function login(
 ) {
   try {
     const user = await User.findOne({ name: req.body.name }).exec();
-    console.log(req.body, user);
     if (user.password !== req.body.password) {
       throw new Error();
     }

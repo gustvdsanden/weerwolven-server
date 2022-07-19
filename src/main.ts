@@ -5,9 +5,10 @@ import { Server } from 'socket.io';
 import { db } from './models';
 import { router as userRouter } from './routes/user.routes';
 import { router as roleRouter } from './routes/role.routes';
+import { router as authRouter } from './routes/auth.router';
+import { router as lobbyRouter } from './routes/lobby.router';
 import bodyParser from 'body-parser';
-import { User } from './models/user.model';
-import { _getUserById } from './controllers/user.controller';
+import { baseListeners } from './listeners/base';
 
 export const app = express();
 app.use(bodyParser.json());
@@ -27,34 +28,12 @@ export const io = new Server(httpServer, {
 
 app.use('/users', userRouter);
 app.use('/roles', roleRouter);
+app.use('/auth', authRouter);
+app.use('/lobby', lobbyRouter);
 
 db.mongoose.connect(db.url).then(() => {
   db.seed();
   console.log('Connected to the database!', db.url);
-});
-
-io.on('connection', async (socket) => {
-  let connectedUser: User = null;
-  const userId = Array.isArray(socket.handshake.query.userId)
-    ? socket.handshake.query.userId[0]
-    : socket.handshake.query.userId;
-
-  await _getUserById(userId)
-    .then((user) => {
-      connectedUser = user;
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-  if (!connectedUser) {
-    socket.disconnect();
-    return;
-  }
-
-  socket.on('message', (msg) => {
-    console.log('test');
-    io.emit(`message`, `${connectedUser.name}: ${msg}`);
-  });
 });
 
 const PORT = process.env.PORT || 3000;
