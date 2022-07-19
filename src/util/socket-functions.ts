@@ -18,7 +18,7 @@ export function socketFunctions(socket: Socket) {
     type: keyof typeof consoleTypeOptions,
     extraOptions?: { [key: string]: any },
   ) {
-    socket.emit('message', {
+    socket.emit('console', {
       type,
       options: { ...consoleTypeOptions[type], ...extraOptions },
     });

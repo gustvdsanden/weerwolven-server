@@ -9,7 +9,5 @@ export function _createNewNamespace() {
 
   baseListeners(namespace);
 
-  console.log(Array.from(io._nsps.keys()));
-
   return namespace;
 }

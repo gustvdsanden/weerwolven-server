@@ -2,7 +2,6 @@ import { Namespace, Server } from 'socket.io';
 import { socketFunctions } from '../util';
 import { _getUserById } from '../controllers/user.controller';
 import { User } from '../models/user.model';
-import { io } from '../main';
 
 export function baseListeners(instance: Server | Namespace) {
   instance.on('connection', async (socket) => {
@@ -27,7 +26,7 @@ export function baseListeners(instance: Server | Namespace) {
     }
 
     socket.on('message', (msg) => {
-      io.emit(`message`, `${connectedUser.name}: ${msg}`);
+      socket.emit('message', `${connectedUser.name}: ${msg}`);
     });
   });
 }

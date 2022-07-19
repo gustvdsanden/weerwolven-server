@@ -31,8 +31,6 @@ app.use('/roles', roleRouter);
 app.use('/auth', authRouter);
 app.use('/lobby', lobbyRouter);
 
-baseListeners(io);
-
 db.mongoose.connect(db.url).then(() => {
   db.seed();
   console.log('Connected to the database!', db.url);
