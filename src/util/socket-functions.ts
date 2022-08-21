@@ -1,30 +1,48 @@
-import { Socket } from 'socket.io';
+import { Namespace, Server, Socket } from 'socket.io';
 
-const consoleTypeOptions = {
-  connectedSuccesfully: {
-    color: 'blue',
-    message: 'Connected successfully',
+const gameStateTypes = {
+  werewolf: {
+    color: 'red',
   },
-  defaultMessage: {
-    color: 'black',
-  },
-  gameStateUpdate: {
-    color: 'yellow',
+  civilian: {
+    color: 'brown',
   },
 };
 
-export function socketFunctions(socket: Socket) {
-  function emitConsoleMessage(
-    type: keyof typeof consoleTypeOptions,
-    extraOptions?: { [key: string]: any },
+export function socketFunctions(socket: Server | Namespace) {
+  function emitMessage(
+    message: string,
+    options?: { [key: string]: any },
+    diffSocket?: Socket,
   ) {
-    socket.emit('console', {
-      type,
-      options: { ...consoleTypeOptions[type], ...extraOptions },
+    const instance = diffSocket ?? socket;
+    instance.emit('console', {
+      message,
+      options,
     });
   }
 
+  function emitConnectedSuccesfully() {
+    emitMessage('Connected successfully', { color: 'blue' });
+  }
+
+  function emitLobbyStateUpdate(message: string) {
+    emitMessage(message, { color: 'aqua' });
+  }
+
+  function emitGameStateUpdate(
+    message: string,
+    socket: Socket,
+    type: keyof typeof gameStateTypes,
+  ) {
+    emitMessage(message, { color: gameStateTypes[type].color }, socket);
+  }
+
   return {
-    emitConsoleMessage,
+    emitConnectedSuccesfully,
+    emitLobbyStateUpdate,
+    emitGameStateUpdate,
+
+    emitMessage: (message: string) => emitMessage(message, { color: 'black' }),
   };
 }
