@@ -8,7 +8,6 @@ import { router as roleRouter } from './routes/role.routes';
 import { router as authRouter } from './routes/auth.router';
 import { router as lobbyRouter } from './routes/lobby.router';
 import bodyParser from 'body-parser';
-import { baseListeners } from './listeners/base';
 
 export const app = express();
 app.use(bodyParser.json());
