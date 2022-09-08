@@ -2,12 +2,15 @@ import { io } from '../main';
 
 import { baseListeners } from '../listeners/base';
 import { getUnusedNamespaceCode } from '../util';
+import { ExtendedNamespace } from '../types';
 
 export function _createNewNamespace() {
   const uniqueNamespaceCode = getUnusedNamespaceCode();
   const namespace = io.of(uniqueNamespaceCode);
 
-  baseListeners(namespace);
+  const extendedNamespace = { namespace, data: {} } as ExtendedNamespace;
 
-  return namespace;
+  baseListeners(extendedNamespace);
+
+  return extendedNamespace;
 }

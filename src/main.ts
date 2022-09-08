@@ -8,7 +8,7 @@ import { router as roleRouter } from './routes/role.routes';
 import { router as authRouter } from './routes/auth.router';
 import { router as lobbyRouter } from './routes/lobby.router';
 import bodyParser from 'body-parser';
-import { baseListeners } from './listeners/base';
+import { instrument } from '@socket.io/admin-ui';
 
 export const app = express();
 app.use(bodyParser.json());
@@ -23,6 +23,15 @@ export const io = new Server(httpServer, {
   cors: {
     origin: '*',
     methods: ['GET', 'POST'],
+    credentials: false,
+  },
+});
+
+instrument(io, {
+  auth: {
+    type: 'basic',
+    username: 'admin',
+    password: '$2a$12$htoL.x/Ao/51hr5vivXVzu92qoh9648q4aXriLh623MUhbNX9DTiS', // "changeit" encrypted with bcrypt
   },
 });
 

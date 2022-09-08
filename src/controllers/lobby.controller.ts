@@ -1,8 +1,18 @@
 import { TypedRequestBody, TypedResponse } from '../types';
 import { _createNewNamespace } from './namespace.controller';
 
-export function createLobby(req: TypedRequestBody<void>, res: TypedResponse) {
+export function createLobby(
+  req: TypedRequestBody<{ creatorId: string }>,
+  res: TypedResponse,
+) {
+  if (req.body.creatorId === '') {
+    res.status(400).send('No creator id specified');
+    return;
+  }
+
   const newLobby = _createNewNamespace();
 
-  return res.send(newLobby.name.substring(1));
+  newLobby.data.creatorId = req.body.creatorId;
+
+  res.send(newLobby.namespace.name.substring(1));
 }
