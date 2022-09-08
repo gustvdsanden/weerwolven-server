@@ -13,6 +13,7 @@ export function baseListeners(instance: ExtendedNamespace) {
     } = socketFunctions(instance.namespace);
 
     let connectedUser: User = null;
+    let connectedUsers: User[] = [];
     const userId = Array.isArray(socket.handshake.query.userId)
       ? socket.handshake.query.userId[0]
       : socket.handshake.query.userId;
@@ -25,9 +26,9 @@ export function baseListeners(instance: ExtendedNamespace) {
           ...user._doc,
           isOwner: user.id === instance.data.creatorId,
         };
-        const connectedUsers = Array.from(
-          instance.namespace.sockets.values(),
-        ).map((connectedSocket) => connectedSocket.data) as User[];
+        connectedUsers = Array.from(instance.namespace.sockets.values()).map(
+          (connectedSocket) => connectedSocket.data,
+        ) as User[];
 
         emitConnectedSuccesfully(socket);
         emitLobbyStateUpdate(`${connectedUser.name} connected to the lobby`);
@@ -45,9 +46,9 @@ export function baseListeners(instance: ExtendedNamespace) {
     socket.on('disconnect', () => {
       emitLobbyStateUpdate(`${connectedUser.name} disconnected from the lobby`);
 
-      const connectedUsers = Array.from(
-        instance.namespace.sockets.values(),
-      ).map((connectedSocket) => connectedSocket.data) as User[];
+      connectedUsers = Array.from(instance.namespace.sockets.values()).map(
+        (connectedSocket) => connectedSocket.data,
+      ) as User[];
 
       emitData({ connectedUsers: connectedUsers });
     });
@@ -59,6 +60,25 @@ export function baseListeners(instance: ExtendedNamespace) {
         sender: connectedUser.name,
       };
       emitMessage(message);
+    });
+
+    // socket.on('test', (arg, callback) => {
+    //   console.log(JSON.stringify(arg));
+    //   callback(JSON.stringify(arg));
+    // });
+
+    socket.on('kick', (id: string, callback) => {
+      if (socket.data.user.isOwner) {
+        const sockets = Array.from(instance.namespace.sockets.values());
+        const socketToKick = sockets.find(
+          (socket) => socket.data.user._id.toString() === id,
+        );
+
+        if (socketToKick) {
+          socketToKick.disconnect();
+          callback(id);
+        }
+      }
     });
   });
 }
